@@ -2,13 +2,13 @@ import Image from "next/image";
 
 export default function Home() {
     return (
-        <div className="flex flex-col items-center p-6 bg-white min-h-screen">
+        <div className="Ecolar">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">EcoLar</h1>
             <p className="text-lg text-gray-700 mb-8 text-center max-w-2xl">
                 A EcoLar é uma organização focada em promover <span className="text-green-600 font-semibold">soluções sustentáveis</span> para residências, visando reduzir o impacto ambiental e melhorar a eficiência energética dos lares. A EcoLar desenvolve projetos e fornece orientações para <span className="text-green-600 font-semibold">minimizar a emissão de CO₂</span>, incentivar o uso de energias renováveis e otimizar o consumo de recursos, contribuindo para um futuro mais sustentável e consciente.
             </p>
 
-            <section className="w-full max-w-4xl">
+            <section className="Funcionalidades">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Funcionalidades</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-white shadow-lg rounded-lg overflow-hidden">
@@ -37,7 +37,7 @@ export default function Home() {
                         <div className="flex flex-col items-center p-6 bg-white min-h-screen">
             
 
-            <section className="w-full max-w-4xl mb-8">
+            <section className="Calculo-CO2">
                 <div className="CO2">
                     <div className="bg-white shadow-lg rounded-lg overflow-hidden">
                         <Image 
@@ -54,7 +54,7 @@ export default function Home() {
                             </p>
                         </div>
                     </div>
-                    <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <div className="Perfil">
                         <Image 
                             src="/img/perfil.jpg" 
                             alt="Perfil" 
@@ -72,7 +72,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <section className="w-full max-w-3xl mb-8 text-gray-800">
+            <section className="Por que usar EcoLar">
                 <h2 className="text-2xl font-semibold mb-4">Por que usar EcoLar?</h2>
                 <p className="mb-4">
                     Com a EcoLar, você investe no seu <span className="text-green-600 font-semibold">lar</span> e no <span className="text-green-600 font-semibold">planeta</span> ao mesmo tempo.
@@ -93,7 +93,7 @@ export default function Home() {
                 </p>
             </section>
 
-            <section className="w-full max-w-4xl mb-8">
+            <section className="Desenvolvedores">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">Desenvolvedores</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-gray-100 shadow-md rounded-lg p-6 text-center">

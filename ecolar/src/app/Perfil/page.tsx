@@ -180,6 +180,7 @@ const EcoLarPage: React.FC = () => {
                       <option value="">Tipo veículo</option>
                       <option value="carro">Carro</option>
                       <option value="moto">Moto</option>
+                      <option value="bicicleta-eletrica">Bicicleta eletrica</option>
                     </select>
                   </div>
                   <input
@@ -207,8 +208,8 @@ const EcoLarPage: React.FC = () => {
                       aria-label="Tipo de gás"
                     >
                       <option value="">Tipo de gás</option>
-                      <option value="natural">Gás Natural</option>
-                      <option value="butano">Gás Butano</option>
+                      <option value="natural">Botijão</option>
+                      <option value="butano">Encanado</option>
                     </select>
                   </div>
                   <input

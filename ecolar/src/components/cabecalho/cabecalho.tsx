@@ -27,7 +27,7 @@ const Cabecalho: React.FC = () => {
           <div className="self-stretch my-auto cursor-pointer">Eduque-se</div>
         </Link>
 
-        <Link href="/login" passHref>
+        <Link href="/Login" passHref>
           <div className="gap-2 self-stretch px-6 py-3.5 my-auto text-base bg-black rounded-lg shadow-sm text-white text-opacity-90 max-md:px-5 cursor-pointer">
             Login
           </div>

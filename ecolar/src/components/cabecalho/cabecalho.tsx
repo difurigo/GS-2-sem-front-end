@@ -23,7 +23,7 @@ const Cabecalho: React.FC = () => {
           <div className="self-stretch my-auto cursor-pointer">Perfil</div>
         </Link>
 
-        <Link href="/eduque-se" passHref>
+        <Link href="/Eduquese" passHref>
           <div className="self-stretch my-auto cursor-pointer">Eduque-se</div>
         </Link>
 

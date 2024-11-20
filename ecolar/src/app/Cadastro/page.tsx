@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
+import axios from 'axios';
 import '../globals.css';
-
 
 interface InputFieldProps {
   label: string;
@@ -29,10 +29,37 @@ const CadastroPage: React.FC = () => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
+    setIsSubmitting(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    const usuario = {
+      nome: `${firstName} ${lastName}`,
+      email: email,
+      senha: password,
+    };
+
+    try {
+      const response = await axios.post('/usuario', usuario);
+
+      console.log('Usuário cadastrado com sucesso:', response.data);
+      setSuccessMessage('Cadastro realizado com sucesso!');
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setPassword('');
+    } catch (error: any) {
+      console.error('Erro ao cadastrar usuário:', error);
+      setErrorMessage('Ocorreu um erro ao cadastrar o usuário. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -54,7 +81,7 @@ const CadastroPage: React.FC = () => {
             </div>
             <div className="flex flex-col flex-1 grow shrink-0 basis-0 min-h-[80px] w-fit">
               <InputField
-                label="Ultimo nome"
+                label="Último nome"
                 type="text"
                 placeholder="Smitherton"
                 value={lastName}
@@ -78,11 +105,15 @@ const CadastroPage: React.FC = () => {
           />
           <button
             type="submit"
+            disabled={isSubmitting}
             className="gap-2 self-stretch px-8 py-4 mt-10 text-xl text-white whitespace-nowrap bg-black rounded-lg shadow-sm max-md:px-5"
           >
-            Cadastre
+            {isSubmitting ? 'Cadastrando...' : 'Cadastre'}
           </button>
         </form>
+
+        {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
+        {successMessage && <p className="text-green-500 mt-4">{successMessage}</p>}
       </div>
     </div>
   );

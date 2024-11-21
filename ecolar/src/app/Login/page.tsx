@@ -23,10 +23,37 @@ const LoginPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login submitted:', formData);
+
+    const payload = {
+      nome: formData.firstName,
+      email: formData.email,
+      senha: formData.password,
+    };
+
+    try {
+      const response = await fetch('http://localhost:8080/usuario/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Login successful:', data);
+        // Adicionar lógica adicional aqui (redirecionamento, mensagem de sucesso, etc.)
+      } else {
+        const error = await response.json();
+        console.error('Login failed:', error);
+        // Adicionar lógica de erro aqui (exibir mensagem de erro, etc.)
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      // Tratar erro de conexão ou requisição
+    }
   };
 
   return (

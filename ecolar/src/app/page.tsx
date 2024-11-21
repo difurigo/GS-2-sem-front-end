@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
+import "../app/globals.css"
 
 
 const EcoLarPage: React.FC = () => {

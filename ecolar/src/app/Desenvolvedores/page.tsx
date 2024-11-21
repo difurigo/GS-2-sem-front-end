@@ -25,27 +25,55 @@ interface ProfileCardProps {
   rm: string;
   links: { [key: string]: string };
   turma: string;
+  imageUrl: string;
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ name, rm, links, turma }) => (
+const ProfileCard: React.FC<ProfileCardProps> = ({ name, rm, links, turma, imageUrl }) => (
   <div className="flex flex-col p-8 mt-12 w-full font-medium bg-white rounded-xl border border-solid border-neutral-200 max-w-[1106px] min-h-[245px] max-md:px-5 max-md:mt-10 max-md:max-w-full">
     <div className="text-2xl text-black max-md:max-w-full">{name}</div>
     <div className="flex gap-4 items-center mt-12 max-w-full text-base text-black min-h-[97px] w-[258px] max-md:mt-10">
       <div className="flex gap-4 items-center self-stretch my-auto whitespace-nowrap min-h-[97px] min-w-[240px] w-[258px]">
-        <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/ad47470f8615a3840dd4d6591878166e40e76e0901e13cf01a49079d4862d483?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8" className="object-contain shrink-0 self-stretch my-auto rounded-full aspect-[1.06] w-[103px]" alt={name} />
-        <div className="self-stretch my-auto">RM:{rm}</div>
+        <img
+          loading="lazy"
+          src={imageUrl}
+          className="object-contain shrink-0 self-stretch my-auto rounded-full aspect-[1.06] w-[103px]"
+          alt={name}
+        />
+        <div className="self-stretch my-auto">RM: {rm}</div>
       </div>
-      {Object.entries(links).map(([platform, link], index) => (
-        <React.Fragment key={platform}>
-          <img loading="lazy" src={`http://b.io/ext_${5 + index}-`} className="object-contain shrink-0 self-stretch my-auto rounded-full aspect-[1.06] w-[103px]" alt={platform} />
-          <div className="self-stretch my-auto whitespace-nowrap">{link}</div>
-        </React.Fragment>
-      ))}
-      <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/316e48114a5e7513568d47aed2c03bcd915247be70aa89b2c7fef9f04b784b63?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8" className="object-contain shrink-0 self-stretch my-auto rounded-full aspect-[1.06] w-[103px]" alt="Turma" />
+      {Object.entries(links).map(([platform, link]) => {
+        // Definir logos para cada plataforma
+        const logoMap: Record<string, string> = {
+          GitHub: "https://cdn-icons-png.flaticon.com/256/25/25231.png",
+          LinkedIn: "https://cdn-icons-png.flaticon.com/256/174/174857.png", // Exemplo para LinkedIn
+        };
+        return (
+          <React.Fragment key={platform}>
+            <div className="flex items-center gap-2">
+              <img
+                loading="lazy"
+                src={logoMap[platform] || ""}
+                className="object-contain rounded-full w-[32px] h-[32px]"
+                alt={`${platform} logo`}
+              />
+              <a
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="self-stretch my-auto whitespace-nowrap text-blue-500 underline"
+              >
+                {platform}
+              </a>
+            </div>
+          </React.Fragment>
+        );
+      })}
       <div className="self-stretch my-auto">Turma: {turma}</div>
     </div>
   </div>
 );
+
+
 
 const IntegrantesPage: React.FC = () => {
   return (
@@ -56,9 +84,9 @@ const IntegrantesPage: React.FC = () => {
         </div>
         <div className="self-end mt-8 w-full max-w-[1186px] max-md:max-w-full">
           <div className="flex gap-5 max-md:flex-col">
-            <DeveloperCard name="Luis Henrique" rm="558935" imageUrl="https://cdn.builder.io/api/v1/image/assets/TEMP/370743605fc37792fa86bdc5d7d96f9c19f2fd96cb6ae32abef3e417bc3fa055?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8" />
+            <DeveloperCard name="Luis Henrique" rm="558935" imageUrl="https://cdn.builder.io/api/v1/image/assets/TEMP/4bffbccdb1d35a24d918de3932a5758012416894a92ab25cc629544eca5670de?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8" />
             <DeveloperCard name="Melissa Pereira" rm="555656" imageUrl="https://cdn.builder.io/api/v1/image/assets/TEMP/c9b84c73010d5d84dd1cee7403a8161fbdc2670c8cb3f708fce9ae7853dd65c9?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8" />
-            <DeveloperCard name="Diego Furigo" rm="558755" imageUrl="https://cdn.builder.io/api/v1/image/assets/TEMP/370743605fc37792fa86bdc5d7d96f9c19f2fd96cb6ae32abef3e417bc3fa055?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8" />
+            <DeveloperCard name="Diego Furigo" rm="558755" imageUrl="https://cdn.builder.io/api/v1/image/assets/TEMP/20e8f537301039f543e1bfc779f26093c3a31bdda0b06198667d2dffc8cd2dbb?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8" />
           </div>
         </div>
         <div className="mt-14 ml-3.5 text-3xl font-semibold text-black max-md:mt-10 max-md:ml-2.5">
@@ -67,20 +95,23 @@ const IntegrantesPage: React.FC = () => {
         <ProfileCard
           name="Diego Furigo"
           rm="558935"
-          links={{ GitHub: "Link", LinkedIn: "Link" }}
+          links={{ GitHub: "https://github.com/difurigo", LinkedIn: "https://www.linkedin.com/in/diego-furigo-do-nascimento-4091311b3/" }}
           turma="1TDSPY"
+          imageUrl='https://cdn.builder.io/api/v1/image/assets/TEMP/20e8f537301039f543e1bfc779f26093c3a31bdda0b06198667d2dffc8cd2dbb?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8'
         />
         <ProfileCard
           name="Luis Henrique"
           rm="558935"
-          links={{ GitHub: "Link", LinkedIn: "luixvieira" }}
+          links={{ GitHub: "https://github.com/luixvieira", LinkedIn: "https://www.linkedin.com/in/luhenrivieira/" }}
           turma="1TDSPY"
+          imageUrl='https://cdn.builder.io/api/v1/image/assets/TEMP/4bffbccdb1d35a24d918de3932a5758012416894a92ab25cc629544eca5670de?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8'
         />
         <ProfileCard
           name="Melissa Pereira"
           rm="558935"
-          links={{ GitHub: "Link", LinkedIn: "Link" }}
+          links={{ GitHub: "https://github.com/Melpscosta", LinkedIn: "https://www.linkedin.com/in/melissa-pereira-b3a2a519a/" }}
           turma="1TDSPY"
+          imageUrl='https://cdn.builder.io/api/v1/image/assets/TEMP/c9b84c73010d5d84dd1cee7403a8161fbdc2670c8cb3f708fce9ae7853dd65c9?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8'
         />
       </div>
     </div>

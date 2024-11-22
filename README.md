@@ -22,4 +22,4 @@ Na pagina login o usuario pode se logar, ou se cadastrar clicando na opção de 
 
 Na pagina "eduque-se" temos instruções sobre diminuição de emissão de CO2 e na pagina "integrantes" o RM, link para o linkedin e github
 
-Obrigado<3>
+Obrigado<3

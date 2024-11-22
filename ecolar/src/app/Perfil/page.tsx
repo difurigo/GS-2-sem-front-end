@@ -1,11 +1,22 @@
+"use client"
 import * as React from "react";
-import '../globals.css'
+import { useState, useEffect } from "react";
+import "../globals.css";
 interface CalculatorPageProps {
-  userName?: string;
   userId?: string;
 }
 
-export default function CalculatorPage({ userName, userId }: CalculatorPageProps) {
+export default function CalculatorPage({ userId }: CalculatorPageProps) {
+  const [userName, setUserName] = useState<string>("");
+
+  useEffect(() => {
+    // Recupera o nome do usuário armazenado no localStorage
+    const storedName = localStorage.getItem("nomeUsuario");
+    if (storedName) {
+      setUserName(storedName);
+    }
+  }, []);
+
   return (
     <div className="flex overflow-hidden flex-col bg-white">
       <div className="flex flex-col items-start self-center mt-12 w-full max-w-[1237px] max-md:mt-10 max-md:max-w-full">
@@ -26,12 +37,9 @@ export default function CalculatorPage({ userName, userId }: CalculatorPageProps
                     Nome:
                     <br />
                   </div>
-                  <div className="max-md:text-4xl">{userName}</div>
+                  <div className="max-md:text-4xl">{userName || "Usuário"}</div>
                 </div>
-                <div className="flex gap-6 self-start mt-1.5 max-md:text-4xl">
-                  <div className="self-start max-md:text-4xl">Id:</div>
-                  <div className="max-md:text-4xl">{userId}</div>
-                </div>
+
               </div>
             </div>
           </div>

@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from 'react';
-import '../globals.css';
-import Link from 'next/link';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import "../globals.css";
+import Link from "next/link";
 
 interface LoginFormData {
   firstName: string;
@@ -11,14 +12,16 @@ interface LoginFormData {
 
 const LoginPage: React.FC = () => {
   const [formData, setFormData] = useState<LoginFormData>({
-    firstName: '',
-    email: '',
-    password: '',
+    firstName: "",
+    email: "",
+    password: "",
   });
+
+  const router = useRouter(); // Para redirecionar
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
@@ -34,26 +37,33 @@ const LoginPage: React.FC = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:8080/usuario/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8080/usuario/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Login successful:', data);
-        // Adicionar lógica adicional aqui (redirecionamento, mensagem de sucesso, etc.)
+
+        if (data.message.includes("Login realizado com sucesso")) {
+          const nomeUsuario = data.message.split(", ")[1];
+          // Armazenar o nome do usuário no localStorage
+          localStorage.setItem("nomeUsuario", nomeUsuario);
+
+          // Redirecionar para a página desejada
+          router.push("/Perfil");
+        } else {
+          console.error("Mensagem inesperada:", data.message);
+        }
       } else {
         const error = await response.json();
-        console.error('Login failed:', error);
-        // Adicionar lógica de erro aqui (exibir mensagem de erro, etc.)
+        console.error("Login failed:", error);
       }
     } catch (error) {
-      console.error('Error during login:', error);
-      // Tratar erro de conexão ou requisição
+      console.error("Error during login:", error);
     }
   };
 
@@ -65,7 +75,9 @@ const LoginPage: React.FC = () => {
         </h1>
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col mt-6 max-w-full h-20 w-[295px]">
-            <label htmlFor="firstName" className="text-3xl text-black">Primeiro nome</label>
+            <label htmlFor="firstName" className="text-3xl text-black">
+              Primeiro nome
+            </label>
             <input
               type="text"
               id="firstName"
@@ -77,7 +89,9 @@ const LoginPage: React.FC = () => {
             />
           </div>
           <div className="flex flex-col mt-8 w-full h-20 whitespace-nowrap max-md:max-w-full">
-            <label htmlFor="email" className="text-3xl text-black max-md:max-w-full">Email</label>
+            <label htmlFor="email" className="text-3xl text-black max-md:max-w-full">
+              Email
+            </label>
             <input
               type="email"
               id="email"
@@ -89,7 +103,9 @@ const LoginPage: React.FC = () => {
             />
           </div>
           <div className="flex flex-col mt-8 w-full h-20 whitespace-nowrap max-md:max-w-full">
-            <label htmlFor="password" className="text-3xl text-black max-md:max-w-full">Senha</label>
+            <label htmlFor="password" className="text-3xl text-black max-md:max-w-full">
+              Senha
+            </label>
             <input
               type="password"
               id="password"

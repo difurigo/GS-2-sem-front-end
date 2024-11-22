@@ -1,263 +1,270 @@
-"use client"
-import * as React from "react";
-import { useState, useEffect } from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import "../globals.css";
-interface CalculatorPageProps {
-  userId?: string;
-}
 
-export default function CalculatorPage({ }: CalculatorPageProps) {
+const PerfilPage: React.FC = () => {
   const [userName, setUserName] = useState<string>("");
+  const [residenciaId, setResidenciaId] = useState<number | null>(null);
+  const [tipoResidencia, setTipoResidencia] = useState<string>("");
+  const [endereco, setEndereco] = useState<string>("");
+  const [numero, setNumero] = useState<number | null>(null);
+  const [moradores, setMoradores] = useState<number | null>(null);
+
+  const [eletrodomestico, setEletrodomestico] = useState<string>("");
+  const [horasDiarias, setHorasDiarias] = useState<number | null>(null);
+
+  const [nomeCarro, setNomeCarro] = useState<string>("");
+  const [tipoVeiculo, setTipoVeiculo] = useState<string>("");
+  const [kmMensal, setKmMensal] = useState<number | null>(null);
+
+  const [tipoGas, setTipoGas] = useState<string>("");
+  const [quantidadeMensal, setQuantidadeMensal] = useState<number | null>(null);
 
   useEffect(() => {
-    // Recupera o nome do usuário armazenado no localStorage
     const storedName = localStorage.getItem("nomeUsuario");
     if (storedName) {
       setUserName(storedName);
     }
   }, []);
 
+  const handleAdicionarResidencia = async () => {
+    const payload = { tipoResidencia, endereco, numero, moradores };
+    try {
+      const response = await fetch("ENDPOINT_RESIDENCIA", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setResidenciaId(data.residenciaId);
+        alert("Residência adicionada com sucesso!");
+      } else {
+        alert("Erro ao adicionar residência.");
+      }
+    } catch (error) {
+      console.error("Erro ao adicionar residência:", error);
+    }
+  };
+
+  const handleAdicionarEletrodomestico = async () => {
+    if (!residenciaId) return alert("Adicione uma residência primeiro.");
+    const payload = {
+      residencia: { residenciaId },
+      nomeBem: eletrodomestico,
+      horasDiarias,
+    };
+    try {
+      const response = await fetch("http://localhost:8080/bens/eletrodomestico", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        alert("Eletrodoméstico adicionado com sucesso!");
+      } else {
+        alert("Erro ao adicionar eletrodoméstico.");
+      }
+    } catch (error) {
+      console.error("Erro ao adicionar eletrodoméstico:", error);
+    }
+  };
+
+  const handleAdicionarCarro = async () => {
+    if (!residenciaId) return alert("Adicione uma residência primeiro.");
+    const payload = {
+      residencia: { residenciaId },
+      nomeBem: nomeCarro,
+      tipoVeiculo,
+      kmMensal,
+    };
+    try {
+      const response = await fetch("http://localhost:8080/bens/carro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        alert("Carro adicionado com sucesso!");
+      } else {
+        alert("Erro ao adicionar carro.");
+      }
+    } catch (error) {
+      console.error("Erro ao adicionar carro:", error);
+    }
+  };
+
+  const handleAdicionarGas = async () => {
+    if (!residenciaId) return alert("Adicione uma residência primeiro.");
+    const payload = {
+      residencia: { residenciaId },
+      nomeBem: tipoGas === "GLP" ? "Cilindro de Gás" : "Gás Encanado",
+      quantidadeMensal,
+    };
+    try {
+      const response = await fetch("http://localhost:8080/bens/gas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        alert("Gás adicionado com sucesso!");
+      } else {
+        alert("Erro ao adicionar gás.");
+      }
+    } catch (error) {
+      console.error("Erro ao adicionar gás:", error);
+    }
+  };
+
   return (
-    <div className="flex overflow-hidden flex-col bg-white">
-      <div className="flex flex-col items-start self-center mt-12 w-full max-w-[1237px] max-md:mt-10 max-md:max-w-full">
-        <div className="self-center px-16 py-6 max-w-full rounded-xl bg-neutral-100 w-[1206px] max-md:px-5">
-          <div className="flex gap-5 max-md:flex-col">
-            <div className="flex flex-col w-[36%] max-md:ml-0 max-md:w-full">
-              <img
-                loading="lazy"
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/483c4adedfd94c73143a079cb4dc3a680376dbedb30c7c0d4ea9d3d600e530f2?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8"
-                className="object-contain shrink-0 max-w-full aspect-square w-[136px] max-md:mt-10"
-                alt="User profile"
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
+      <div className="bg-white shadow-md rounded-lg w-11/12 max-w-4xl p-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">Bem-vindo, {userName || "Usuário"}!</h1>
+        <p className="text-gray-600 mb-6">Adicione informações sobre sua residência e bens para calcular o impacto.</p>
+
+        {/* Formulário Residência */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Adicionar Residência</h2>
+          <div className="space-y-4">
+            <select
+              value={tipoResidencia}
+              onChange={(e) => setTipoResidencia(e.target.value)}
+              className="w-full p-3 border rounded-md"
+            >
+              <option value="">Selecione o tipo de residência</option>
+              <option value="Casa">Casa</option>
+              <option value="Apartamento">Apartamento</option>
+            </select>
+            <input
+              type="text"
+              placeholder="Endereço"
+              value={endereco}
+              onChange={(e) => setEndereco(e.target.value)}
+              className="w-full p-3 border rounded-md"
+            />
+            <input
+              type="number"
+              placeholder="Número"
+              value={numero || ""}
+              onChange={(e) => setNumero(Number(e.target.value))}
+              className="w-full p-3 border rounded-md"
+            />
+            <input
+              type="number"
+              placeholder="Moradores"
+              value={moradores || ""}
+              onChange={(e) => setMoradores(Number(e.target.value))}
+              className="w-full p-3 border rounded-md"
+            />
+            <button
+              onClick={handleAdicionarResidencia}
+              className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800"
+            >
+              Adicionar Residência
+            </button>
+          </div>
+        </div>
+
+        {/* Outros Formulários */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Formulário Eletrodoméstico */}
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Adicionar Eletrodoméstico</h2>
+            <div className="space-y-4">
+              <select
+                value={eletrodomestico}
+                onChange={(e) => setEletrodomestico(e.target.value)}
+                className="w-full p-3 border rounded-md"
+              >
+                <option value="">Selecione o eletrodoméstico</option>
+                <option value="Geladeira">Geladeira</option>
+                <option value="Fogão">Fogão</option>
+              </select>
+              <input
+                type="number"
+                placeholder="Horas Diárias"
+                value={horasDiarias || ""}
+                onChange={(e) => setHorasDiarias(Number(e.target.value))}
+                className="w-full p-3 border rounded-md"
               />
-            </div>
-            <div className="flex flex-col ml-5 w-[64%] max-md:ml-0 max-md:w-full">
-              <div className="flex flex-col self-stretch my-auto w-full text-5xl font-semibold tracking-tighter text-black whitespace-nowrap max-md:mt-10 max-md:text-4xl">
-                <div className="flex gap-4 max-md:text-4xl">
-                  <div className="max-md:text-4xl">
-                    Nome:
-                    <br />
-                  </div>
-                  <div className="max-md:text-4xl">{userName || "Usuário"}</div>
-                </div>
-
-              </div>
+              <button
+                onClick={handleAdicionarEletrodomestico}
+                className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800"
+              >
+                Adicionar Eletrodoméstico
+              </button>
             </div>
           </div>
-        </div>
-        <div className="flex flex-col self-stretch px-10 pt-24 pb-9 mt-14 ml-2.5 w-full rounded-xl bg-zinc-600 bg-opacity-50 max-md:px-5 max-md:mt-10 max-md:max-w-full">
-          <div className="max-md:max-w-full">
-            <div className="flex gap-5 max-md:flex-col">
-              <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-                <div className="flex flex-col items-start py-6 pr-20 pl-7 mx-auto w-full text-2xl font-semibold text-black rounded-xl bg-neutral-200 bg-opacity-60 max-md:px-5 max-md:mt-10 max-md:max-w-full">
-                  <div className="text-4xl font-semibold leading-tight">
-                    Adicionar residência
-                  </div>
 
-                  <select defaultValue="" className="flex gap-2 items-center py-1.5 pr-4 pl-6 mt-6 rounded-md shadow-sm bg-neutral-200 min-h-[48px] max-md:pl-5">
-                    <option value="" disabled>Selecione o tipo de residência</option>
-                    <option value="casa">Casa</option>
-                    <option value="apartamento">Apartamento</option>
-                  </select>
-
-                  <input
-                    type="text"
-                    className="gap-2 self-stretch py-1 pr-6 pl-6 mt-3 whitespace-nowrap shadow-sm bg-neutral-200 min-h-[42px] max-md:px-5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Endereço"
-                  />
-
-                  <input
-                    type="number"
-                    min="0"
-                    className="gap-2 self-stretch py-1 pr-6 pl-6 mt-3 whitespace-nowrap shadow-sm bg-neutral-200 min-h-[42px] max-md:px-5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Número"
-                  />
-
-                  <input
-                    type="number"
-                    min="0"
-                    className="gap-2 self-stretch py-1 pr-6 pl-6 mt-3 whitespace-nowrap shadow-sm bg-neutral-200 min-h-[42px] max-md:px-5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Moradores"
-                  />
-                  <button className="gap-2 self-stretch px-6 py-3 mt-7 font-semibold text-white whitespace-nowrap bg-black shadow-sm max-md:px-5">
-                    Adicionar
-                  </button>
-                </div>
-              </div>
-              
-              <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
-                <div className="flex flex-col items-start px-5 py-7 mx-auto w-full text-2xl font-semibold text-black rounded-xl bg-neutral-200 bg-opacity-60 max-md:mt-10 max-md:max-w-full">
-                  <div className="self-stretch text-4xl leading-tight max-md:max-w-full">
-                    Adicionar eletrodomestico
-                  </div>
-
-                  <select defaultValue="" className="flex gap-2 items-center py-1.5 pr-4 pl-6 mt-6 rounded-md shadow-sm bg-neutral-200 min-h-[48px] max-md:pl-5">
-                      <option value="" disabled>Selecione os eletrodometicos</option>
-                      <option value="chuveiro">Chuveiro</option>
-                      <option value="fogao">Fogão</option>
-                      <option value="air-fryer">Air-Fryer</option>
-                      <option value="televisao">Televisão</option>
-                      <option value="ar-condicionado">Ar-condicionado</option>
-                      <option value="computador">Computador</option>
-                      <option value="micro-ondas">Micro-ondas</option>
-                      <option value="geladeira">Geladeira</option>
-                      <option value="liquidificador">Liquidificador</option>
-                      <option value="batedeira">Batedeira</option>
-                      <option value="cafeteira">Cafeteira</option>
-                      <option value="maquina-de-lavar">Máquina de Lavar Roupas</option>
-                      <option value="ventilador">Ventilador</option>
-                  </select>
-
-                  <input
-                    type="number"
-                    min="0"
-                    className="gap-2 self-stretch py-1 pr-6 pl-6 mt-3 whitespace-nowrap shadow-sm bg-neutral-200 min-h-[42px] max-md:px-5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Horas diárias"
-                  />
-
-                  <button className="gap-2 self-stretch px-6 py-3 mt-32 text-white whitespace-nowrap bg-black shadow-sm max-md:px-5 max-md:mt-10 max-md:ml-2">
-                    Adicionar
-                  </button>
-                </div>
-              </div>
+          {/* Formulário Carro */}
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Adicionar Carro</h2>
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Nome do Carro"
+                value={nomeCarro}
+                onChange={(e) => setNomeCarro(e.target.value)}
+                className="w-full p-3 border rounded-md"
+              />
+              <select
+                value={tipoVeiculo}
+                onChange={(e) => setTipoVeiculo(e.target.value)}
+                className="w-full p-3 border rounded-md"
+              >
+                <option value="">Selecione o tipo de veículo</option>
+                <option value="Gasolina">Gasolina</option>
+                <option value="Elétrico">Elétrico</option>
+              </select>
+              <input
+                type="number"
+                placeholder="Km Mensal"
+                value={kmMensal || ""}
+                onChange={(e) => setKmMensal(Number(e.target.value))}
+                className="w-full p-3 border rounded-md"
+              />
+              <button
+                onClick={handleAdicionarCarro}
+                className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800"
+              >
+                Adicionar Carro
+              </button>
             </div>
           </div>
-          <div className="mt-14 max-md:mt-10 max-md:max-w-full">
-            <div className="flex gap-5 max-md:flex-col">
-              <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-                <div className="flex flex-col items-start py-8 pr-20 pl-7 mx-auto w-full text-2xl font-semibold text-black rounded-xl bg-neutral-200 bg-opacity-60 max-md:px-5 max-md:mt-10 max-md:max-w-full">
-                  <div className="text-4xl leading-tight">Adicionar carro</div>
-                  
-                  <select defaultValue="" className="flex gap-2 items-center py-1.5 pr-4 pl-6 mt-6 rounded-md shadow-sm bg-neutral-200 min-h-[48px] max-md:pl-5">
-                    <option value="" disabled>Selecione o tipo de veículo</option>
-                    <option value="carro">Carro</option>
-                    <option value="moto">Moto</option>
-                  </select>
 
-                  <input
-                    type="number"
-                    min="0"
-                    className="gap-2 self-stretch py-1 pr-6 pl-6 mt-3 whitespace-nowrap shadow-sm bg-neutral-200 min-h-[42px] max-md:px-5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Km mensal"
-                  />
-
-                  <button className="gap-2 self-stretch px-6 py-3 mt-28 text-white whitespace-nowrap bg-black shadow-sm max-md:px-5 max-md:mt-10">
-                    Adicionar
-                  </button>
-                </div>
-              </div>
-              <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
-                <div className="flex flex-col items-start pt-10 pr-20 pb-5 pl-7 mx-auto w-full text-2xl font-semibold text-black rounded-xl bg-neutral-200 bg-opacity-60 max-md:px-5 max-md:mt-10 max-md:max-w-full">
-                  <div className="text-4xl leading-tight">Adicionar gás</div>
-          
-                  <select defaultValue="" className="flex gap-2 items-center py-1.5 pr-4 pl-6 mt-6 rounded-md shadow-sm bg-neutral-200 min-h-[48px] max-md:pl-5">
-                    <option value="" disabled>Selecione o tipo de gás</option>
-                    <option value="glp">Gás de cozinha</option>
-                    <option value="natural">Gás encanado</option>
-                  </select>
-
-                  <input
-                    type="number"
-                    min="0"
-                    className="gap-2 self-stretch py-1 pr-6 pl-6 mt-3 whitespace-nowrap shadow-sm bg-neutral-200 min-h-[42px] max-md:px-5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Quantidade mensal"
-                  />
-                  <button className="gap-2 self-stretch px-6 py-3 mt-28 text-white whitespace-nowrap bg-black shadow-sm max-md:px-5 max-md:mt-10">
-                    Adicionar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <button className="self-center px-4 py-5 mt-14 max-w-full text-3xl font-semibold text-black bg-green-500 rounded-xl w-[239px] max-md:mt-10">
-            Calcular Co2!
-          </button>
-        </div>
-        <div className="mt-20 ml-3 text-5xl font-semibold tracking-tighter text-black max-md:mt-10 max-md:ml-2.5 max-md:text-4xl">
-          Seções
-        </div>
-        <div className="mt-20 w-full max-w-[1207px] max-md:mt-10 max-md:max-w-full">
-          <div className="flex gap-5 max-md:flex-col">
-            <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-              <div className="flex flex-col grow justify-center h-[164px] max-md:mt-10 max-md:max-w-full">
-                <img
-                  loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/1a1e53ee967d9813f52234af20da42920ad2ffd2337d058d2c6ec23739a45039?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8"
-                  className="object-contain aspect-[1.05] w-[60px]"
-                  alt="Residence section icon"
-                />
-                <div className="mt-2 text-3xl font-medium text-black max-md:max-w-full">
-                  Residência
-                </div>
-                <div className="mt-2 text-2xl leading-9 text-zinc-500 max-md:max-w-full">
-                  O consumo de energia em sua casa, como para aquecimento e
-                  refrigeração, está diretamente ligado às emissões de CO2.
-                  Ambientes mais eficientes energeticamente geram menos impacto
-                  no meio ambiente.
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
-              <div className="flex flex-col grow justify-center h-[164px] max-md:mt-10 max-md:max-w-full">
-                <img
-                  loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/a9d6b762e19d76e3dae73970b3ac760ca94e0c2befeec45a6e1aeb15fa067c15?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8"
-                  className="object-contain aspect-[0.94] w-[51px]"
-                  alt="Appliance section icon"
-                />
-                <div className="mt-2 text-3xl font-medium text-black max-md:max-w-full">
-                  Eletrodomestico
-                </div>
-                <div className="mt-2 text-2xl leading-9 text-zinc-500 max-md:max-w-full">
-                  Os aparelhos elétricos consomem energia e, dependendo da
-                  eficiência deles, podem aumentar ou reduzir suas emissões de
-                  CO2. Usar aparelhos mais eficientes ajuda a minimizar esse
-                  impacto.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-28 w-full max-w-[1205px] max-md:mt-10 max-md:max-w-full">
-          <div className="flex gap-5 max-md:flex-col">
-            <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-              <div className="flex flex-col grow justify-center mt-2.5 max-md:mt-10 max-md:max-w-full">
-                <img
-                  loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/ca18199a3478b8385bad99042c5d8844b127599d4c0f10167c5d58e34d8b8b42?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8"
-                  className="object-contain w-9 aspect-[1.03]"
-                  alt="Vehicle section icon"
-                />
-                <div className="mt-2 text-3xl font-medium text-black max-md:max-w-full">
-                  Adicionar Carro
-                </div>
-                <div className="mt-2 text-2xl leading-9 text-zinc-500 max-md:max-w-full">
-                  O transporte, especialmente o uso de combustíveis fósseis, é
-                  uma das maiores fontes de CO2. A frequência de uso e a
-                  eficiência do veículo têm grande impacto nas emissões geradas.
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
-              <div className="flex flex-col justify-center max-md:mt-10 max-md:max-w-full">
-                <img
-                  loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/47e781fd2f5772492bd51be251ecbae86cc8f0fa0d98a2af159d903298b0ad22?placeholderIfAbsent=true&apiKey=4b34c10274424c8b980c81c1ce496da8"
-                  className="object-contain aspect-[0.96] w-[54px]"
-                  alt="Gas section icon"
-                />
-                <div className="mt-2 text-3xl font-medium text-black max-md:max-w-full">
-                  Adicionar gás
-                </div>
-                <div className="mt-2 text-2xl leading-9 text-zinc-500 max-md:max-w-full">
-                  O uso de gás para aquecer ou cozinhar também contribui para a
-                  emissão de CO2. O tipo e a quantidade de gás consumido
-                  influenciam o impacto ambiental.
-                </div>
-              </div>
+          {/* Formulário Gás */}
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Adicionar Gás</h2>
+            <div className="space-y-4">
+              <select
+                value={tipoGas}
+                onChange={(e) => setTipoGas(e.target.value)}
+                className="w-full p-3 border rounded-md"
+              >
+                <option value="">Selecione o tipo de gás</option>
+                <option value="GLP">GLP</option>
+                <option value="Natural">Natural</option>
+              </select>
+              <input
+                type="number"
+                placeholder="Quantidade Mensal"
+                value={quantidadeMensal || ""}
+                onChange={(e) => setQuantidadeMensal(Number(e.target.value))}
+                className="w-full p-3 border rounded-md"
+              />
+              <button
+                onClick={handleAdicionarGas}
+                className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800"
+              >
+                Adicionar Gás
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default PerfilPage;

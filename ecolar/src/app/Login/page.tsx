@@ -2,133 +2,162 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import "../globals.css";
-import Link from "next/link";
 
-interface LoginFormData {
-  firstName: string;
-  email: string;
-  password: string;
+// Componente reutilizável para os campos de entrada
+interface CampoEntradaProps {
+  rotulo: string;
+  tipo: string;
+  placeholder: string;
+  valor: string;
+  aoMudar: (valor: string) => void;
 }
 
-const LoginPage: React.FC = () => {
-  const [formData, setFormData] = useState<LoginFormData>({
-    firstName: "",
-    email: "",
-    password: "",
-  });
+const CampoEntrada: React.FC<CampoEntradaProps> = ({
+  rotulo,
+  tipo,
+  placeholder,
+  valor,
+  aoMudar,
+}) => (
+  <div className="campo-entrada-container flex flex-col mt-4 w-full">
+    <label className="rotulo text-black">{rotulo}</label>
+    <input
+      type={tipo}
+      placeholder={placeholder}
+      value={valor}
+      onChange={(e) => aoMudar(e.target.value)}
+      className="campo-entrada px-4 py-2 mt-2 bg-white rounded-lg border border-solid shadow-sm border-neutral-200 text-zinc-500"
+    />
+  </div>
+);
 
-  const router = useRouter(); // Para redirecionar
+const PaginaLogin: React.FC = () => {
+  const router = useRouter();
+  const [primeiroNome, setPrimeiroNome] = useState(""); // Armazena o primeiro nome do usuário
+  const [sobrenome, setSobrenome] = useState(""); // Armazena o sobrenome do usuário
+  const [email, setEmail] = useState(""); // Armazena o e-mail do usuário
+  const [senha, setSenha] = useState(""); // Armazena a senha do usuário
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
+  const [estaEnviando, setEstaEnviando] = useState(false); // Indica se o formulário está sendo enviado
+  const [mensagemErro, setMensagemErro] = useState(""); // Armazena mensagens de erro
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  // Função para lidar com o envio do formulário
+  const lidarComEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setEstaEnviando(true);
+    setMensagemErro("");
 
-    const payload = {
-      nome: formData.firstName,
-      email: formData.email,
-      senha: formData.password,
+    // Criação do objeto com os dados do usuário
+    const dadosUsuario = {
+      nome: `${primeiroNome} ${sobrenome}`,
+      email: email,
+      senha: senha,
     };
 
     try {
-      const response = await fetch("http://localhost:8080/usuario/login", {
+      // Faz uma requisição para o servidor usando fetch
+      const resposta = await fetch("http://localhost:8080/usuario/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(dadosUsuario),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-
-        if (data.message.includes("Login realizado com sucesso")) {
-          const nomeUsuario = data.message.split(", ")[1];
-          // Armazenar o nome do usuário no localStorage
-          localStorage.setItem("nomeUsuario", nomeUsuario);
-
-          // Redirecionar para a página desejada
-          router.push("/Perfil");
-        } else {
-          console.error("Mensagem inesperada:", data.message);
-        }
+      if (resposta.status === 404) {
+        // Caso o login não seja encontrado, redireciona para a página de cadastro
+        router.push("/Cadastro");
+      } else if (resposta.ok) {
+        // Caso o login seja bem-sucedido
+        const dados = await resposta.json();
+        console.log("Login bem-sucedido:", dados);
+        router.push("/Perfil");
       } else {
-        const error = await response.json();
-        console.error("Login failed:", error);
+        // Caso a resposta não seja bem-sucedida, exibe mensagem de erro
+        const erroDados = await resposta.json();
+        console.error("Erro ao fazer login:", erroDados);
+        setMensagemErro("Credenciais inválidas. Tente novamente.");
       }
-    } catch (error) {
-      console.error("Error during login:", error);
+    } catch (erro) {
+      console.error("Erro de conexão:", erro);
+      setMensagemErro("Erro de conexão. Tente novamente mais tarde.");
+    } finally {
+      setEstaEnviando(false);
     }
   };
 
   return (
-    <div className="flex overflow-hidden flex-col items-start font-medium bg-white">
-      <main className="flex flex-col mt-10 ml-36 max-w-full w-[626px] max-md:mt-10">
-        <h1 className="text-6xl font-bold tracking-tighter text-black whitespace-nowrap max-md:mr-0.5 max-md:max-w-full max-md:text-4xl">
-          Login
+    <div className="pagina-login flex flex-col items-start bg-white">
+      <div className="conteudo-formulario flex flex-col mt-10 mx-auto max-w-xl w-full px-4">
+        <h1 className="titulo-pagina text-4xl font-bold text-black">
+          Faça Login 🚀
         </h1>
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-col mt-6 max-w-full h-20 w-[295px]">
-            <label htmlFor="firstName" className="text-3xl text-black">
-              Primeiro nome
-            </label>
-            <input
-              type="text"
-              id="firstName"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              className="gap-2 px-4 py-3 mt-2 w-full text-xl whitespace-nowrap bg-white rounded-lg border border-solid shadow-sm border-neutral-200 min-h-[51px] text-zinc-500"
-              placeholder="Jane"
-            />
-          </div>
-          <div className="flex flex-col mt-8 w-full h-20 whitespace-nowrap max-md:max-w-full">
-            <label htmlFor="email" className="text-3xl text-black max-md:max-w-full">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="flex-1 shrink gap-2 px-4 pt-3 pb-1.5 mt-2 w-full text-xl leading-8 bg-white rounded-lg border border-solid shadow-sm border-neutral-200 min-h-[52px] text-zinc-500 max-md:max-w-full"
-              placeholder="email@janesfakedomain.net"
-            />
-          </div>
-          <div className="flex flex-col mt-8 w-full h-20 whitespace-nowrap max-md:max-w-full">
-            <label htmlFor="password" className="text-3xl text-black max-md:max-w-full">
-              Senha
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              className="flex-1 shrink gap-2 px-4 py-2.5 mt-2 w-full text-xl bg-white rounded-lg border border-solid shadow-sm border-neutral-200 min-h-[49px] text-zinc-500 max-md:max-w-full"
-              placeholder="••••••••"
-            />
-          </div>
-          <div className="mt-5">
-            <Link href="/Cadastro">Não possui conta? Cadastre-se</Link>
-          </div>
+        <p className="descricao-pagina text-lg text-gray-600 mt-2">
+          Insira suas credenciais para acessar sua conta!
+        </p>
+
+        <form onSubmit={lidarComEnvio} className="formulario-login mt-6">
+          {/* Campo para o primeiro nome */}
+          <CampoEntrada
+            rotulo="Primeiro Nome"
+            tipo="text"
+            placeholder="Digite seu primeiro nome"
+            valor={primeiroNome}
+            aoMudar={setPrimeiroNome}
+          />
+
+          {/* Campo para o sobrenome */}
+          <CampoEntrada
+            rotulo="Sobrenome"
+            tipo="text"
+            placeholder="Digite seu sobrenome"
+            valor={sobrenome}
+            aoMudar={setSobrenome}
+          />
+
+          {/* Campo para o e-mail */}
+          <CampoEntrada
+            rotulo="E-mail"
+            tipo="email"
+            placeholder="seuemail@exemplo.com"
+            valor={email}
+            aoMudar={setEmail}
+          />
+
+          {/* Campo para a senha */}
+          <CampoEntrada
+            rotulo="Senha"
+            tipo="password"
+            placeholder="Digite sua senha"
+            valor={senha}
+            aoMudar={setSenha}
+          />
+
+          {/* Botão de envio */}
           <button
             type="submit"
-            className="gap-2 self-stretch px-8 py-4 mt-20 text-2xl text-white whitespace-nowrap bg-black rounded-lg shadow-sm max-md:px-5 max-md:mt-10"
+            disabled={estaEnviando}
+            className="botao-login w-full px-6 py-3 mt-6 text-white bg-black hover:bg-gray-700 rounded-lg text-lg font-medium"
           >
-            Login
+            {estaEnviando ? "Entrando..." : "Entrar"}
           </button>
         </form>
-      </main>
+
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Ainda não tem conta?{" "}
+          <a href="/Cadastro" className="text-blue-500 hover:underline">
+            Cadastre-se agora
+          </a>
+        </p>
+
+
+        {/* Exibição de mensagens de erro */}
+        {mensagemErro && (
+          <p className="mensagem-erro text-red-500 mt-4">{mensagemErro}</p>
+        )}
+      </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default PaginaLogin;

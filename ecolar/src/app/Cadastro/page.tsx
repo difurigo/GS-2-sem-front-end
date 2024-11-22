@@ -66,7 +66,7 @@ const PaginaCadastro: React.FC = () => {
         },
         body: JSON.stringify(dadosUsuario), // Converte os dados do usuário para JSON
       });
-
+    
       if (resposta.ok) {
         // Caso o cadastro seja bem-sucedido
         const dados = await resposta.json();

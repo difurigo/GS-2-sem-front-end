@@ -15,11 +15,11 @@ const Cabecalho: React.FC = () => {
 
       <div className="flex flex-wrap gap-10 items-center my-auto max-md:max-w-full">
         {/* Navegação para diferentes páginas */}
-        <Link href="/Desenvolvedores" passHref>
+        <Link href="/devs" passHref>
           <div className="self-stretch my-auto cursor-pointer">Integrantes</div>
         </Link>
 
-        <Link href="/Perfil" passHref>
+        <Link href="/perf" passHref>
           <div className="self-stretch my-auto cursor-pointer">Perfil</div>
         </Link>
 

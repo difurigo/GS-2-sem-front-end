@@ -128,7 +128,7 @@ const PaginaLogin: React.FC = () => {
 
         <p className="mt-4 text-center text-sm text-gray-600">
           Ainda não tem conta?{" "}
-          <a href="/Cadastro" className="text-blue-500 hover:underline">
+          <a href="/cad" className="text-blue-500 hover:underline">
             Cadastre-se agora
           </a>
         </p>

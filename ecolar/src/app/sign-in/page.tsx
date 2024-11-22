@@ -74,7 +74,7 @@ const PaginaLogin: React.FC = () => {
         console.log("Login bem-sucedido:", usuarioEncontrado);
 
         // Redireciona para a página de perfil
-        router.push("/Perfil");
+        router.push("/perf");
       } else {
         // Exibe mensagem de erro caso as credenciais estejam incorretas
         setMensagemErro("Email ou senha incorretos. Tente novamente.");

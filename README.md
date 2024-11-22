@@ -6,6 +6,10 @@ Luis Henrique RM:558935
 Diego Furigo: RM558755
 Melissa Pereira da Costa RM555656
 
+## Link Deploy
+O projeto esta deployado em:
+https://ecolargs.vercel.app/
+
 ## Repositorio:
 Link do projeto em Java contendo a API: https://github.com/difurigo/gs2_java.git
 

@@ -33,11 +33,8 @@ const CampoEntrada: React.FC<CampoEntradaProps> = ({
 
 const PaginaLogin: React.FC = () => {
   const router = useRouter();
-  const [primeiroNome, setPrimeiroNome] = useState(""); // Armazena o primeiro nome do usuário
-  const [sobrenome, setSobrenome] = useState(""); // Armazena o sobrenome do usuário
   const [email, setEmail] = useState(""); // Armazena o e-mail do usuário
   const [senha, setSenha] = useState(""); // Armazena a senha do usuário
-
   const [estaEnviando, setEstaEnviando] = useState(false); // Indica se o formulário está sendo enviado
   const [mensagemErro, setMensagemErro] = useState(""); // Armazena mensagens de erro
 
@@ -47,36 +44,40 @@ const PaginaLogin: React.FC = () => {
     setEstaEnviando(true);
     setMensagemErro("");
 
-    // Criação do objeto com os dados do usuário
-    const dadosUsuario = {
-      nome: `${primeiroNome} ${sobrenome}`,
-      email: email,
-      senha: senha,
-    };
-
     try {
-      // Faz uma requisição para o servidor usando fetch
-      const resposta = await fetch("http://localhost:8080/usuario/login", {
-        method: "POST",
+      // Faz uma requisição para buscar todos os usuários
+      const resposta = await fetch("http://localhost:8080/usuario/todos", {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(dadosUsuario),
       });
 
-      if (resposta.status === 404) {
-        // Caso o login não seja encontrado, redireciona para a página de cadastro
-        router.push("/Cadastro");
-      } else if (resposta.ok) {
-        // Caso o login seja bem-sucedido
-        const dados = await resposta.json();
-        console.log("Login bem-sucedido:", dados);
+      if (!resposta.ok) {
+        throw new Error("Erro ao buscar usuários.");
+      }
+
+      const usuarios = await resposta.json();
+
+      // Verifica se o email e a senha correspondem a algum usuário
+      const usuarioEncontrado = usuarios.find(
+        (usuario: { email: string; senha: string }) =>
+          usuario.email === email && usuario.senha === senha
+      );
+
+      if (usuarioEncontrado) {
+        // Armazena os dados do usuário no localStorage
+        localStorage.setItem("nomeUsuario", usuarioEncontrado.nome);
+        localStorage.setItem("idUsuario", usuarioEncontrado.id.toString());
+        localStorage.setItem("emailUsuario", usuarioEncontrado.email);
+
+        console.log("Login bem-sucedido:", usuarioEncontrado);
+
+        // Redireciona para a página de perfil
         router.push("/Perfil");
       } else {
-        // Caso a resposta não seja bem-sucedida, exibe mensagem de erro
-        const erroDados = await resposta.json();
-        console.error("Erro ao fazer login:", erroDados);
-        setMensagemErro("Credenciais inválidas. Tente novamente.");
+        // Exibe mensagem de erro caso as credenciais estejam incorretas
+        setMensagemErro("Email ou senha incorretos. Tente novamente.");
       }
     } catch (erro) {
       console.error("Erro de conexão:", erro);
@@ -97,24 +98,6 @@ const PaginaLogin: React.FC = () => {
         </p>
 
         <form onSubmit={lidarComEnvio} className="formulario-login mt-6">
-          {/* Campo para o primeiro nome */}
-          <CampoEntrada
-            rotulo="Primeiro Nome"
-            tipo="text"
-            placeholder="Digite seu primeiro nome"
-            valor={primeiroNome}
-            aoMudar={setPrimeiroNome}
-          />
-
-          {/* Campo para o sobrenome */}
-          <CampoEntrada
-            rotulo="Sobrenome"
-            tipo="text"
-            placeholder="Digite seu sobrenome"
-            valor={sobrenome}
-            aoMudar={setSobrenome}
-          />
-
           {/* Campo para o e-mail */}
           <CampoEntrada
             rotulo="E-mail"
@@ -149,7 +132,6 @@ const PaginaLogin: React.FC = () => {
             Cadastre-se agora
           </a>
         </p>
-
 
         {/* Exibição de mensagens de erro */}
         {mensagemErro && (

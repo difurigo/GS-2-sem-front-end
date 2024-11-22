@@ -3,268 +3,315 @@ import React, { useState, useEffect } from "react";
 import "../globals.css";
 
 const PerfilPage: React.FC = () => {
-  const [userName, setUserName] = useState<string>("");
-  const [residenciaId, setResidenciaId] = useState<number | null>(null);
+  const [nomeUsuario, setNomeUsuario] = useState<string | null>(null);
+  const [idUsuario, setIdUsuario] = useState<string | null>(null);
+
+  // Residência
   const [tipoResidencia, setTipoResidencia] = useState<string>("");
-  const [endereco, setEndereco] = useState<string>("");
-  const [numero, setNumero] = useState<number | null>(null);
-  const [moradores, setMoradores] = useState<number | null>(null);
+  const [cep, setCep] = useState<string>("");
+  const [logradouro, setLogradouro] = useState<string>("");
+  const [cidade, setCidade] = useState<string>("");
+  const [estado, setEstado] = useState<string>("");
+  const [numResidencia, setNumResidencia] = useState<number>(0);
+  const [numMoradores, setNumMoradores] = useState<number>(0);
 
-  const [eletrodomestico, setEletrodomestico] = useState<string>("");
-  const [horasDiarias, setHorasDiarias] = useState<number | null>(null);
+  const [mensagem, setMensagem] = useState<string>("");
+  // Eletrodoméstico
+  const [nomeBem, setNomeBem] = useState<string>("");
+  const [horasDiarias, setHorasDiarias] = useState<number>(0);
 
-  const [nomeCarro, setNomeCarro] = useState<string>("");
-  const [tipoVeiculo, setTipoVeiculo] = useState<string>("");
-  const [kmMensal, setKmMensal] = useState<number | null>(null);
-
-  const [tipoGas, setTipoGas] = useState<string>("");
-  const [quantidadeMensal, setQuantidadeMensal] = useState<number | null>(null);
-
-  useEffect(() => {
-    const storedName = localStorage.getItem("nomeUsuario");
-    if (storedName) {
-      setUserName(storedName);
+  const adicionarEletrodomestico = async () => {
+    if (!idUsuario) {
+      setMensagem("Você precisa estar logado para adicionar um eletrodoméstico.");
+      return;
     }
-  }, []);
 
-  const handleAdicionarResidencia = async () => {
-    const payload = { tipoResidencia, endereco, numero, moradores };
-    try {
-      const response = await fetch("ENDPOINT_RESIDENCIA", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setResidenciaId(data.residenciaId);
-        alert("Residência adicionada com sucesso!");
-      } else {
-        alert("Erro ao adicionar residência.");
-      }
-    } catch (error) {
-      console.error("Erro ao adicionar residência:", error);
-    }
-  };
-
-  const handleAdicionarEletrodomestico = async () => {
-    if (!residenciaId) return alert("Adicione uma residência primeiro.");
-    const payload = {
-      residencia: { residenciaId },
-      nomeBem: eletrodomestico,
+    const eletrodomesticoData = {
+      residencia: { residenciaId: 1 }, // Substituir com o ID da residência real
+      nomeBem,
       horasDiarias,
     };
+
     try {
-      const response = await fetch("http://localhost:8080/bens/eletrodomestico", {
+      const resposta = await fetch("http://localhost:8080/bens/eletrodomestico", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(eletrodomesticoData),
       });
-      if (response.ok) {
-        alert("Eletrodoméstico adicionado com sucesso!");
+
+      if (resposta.ok) {
+        setMensagem("Eletrodoméstico adicionado com sucesso!");
+        setNomeBem("");
+        setHorasDiarias(0);
       } else {
-        alert("Erro ao adicionar eletrodoméstico.");
+        setMensagem("Erro ao adicionar eletrodoméstico.");
       }
-    } catch (error) {
-      console.error("Erro ao adicionar eletrodoméstico:", error);
+    } catch {
+      setMensagem("Erro de conexão.");
     }
   };
 
-  const handleAdicionarCarro = async () => {
-    if (!residenciaId) return alert("Adicione uma residência primeiro.");
-    const payload = {
-      residencia: { residenciaId },
+  // Carro
+  const [nomeCarro, setNomeCarro] = useState<string>("");
+  const [tipoVeiculo, setTipoVeiculo] = useState<string>("");
+  const [kmMensal, setKmMensal] = useState<number>(0);
+
+  const adicionarCarro = async () => {
+    if (!idUsuario) {
+      setMensagem("Você precisa estar logado para adicionar um carro.");
+      return;
+    }
+
+    const carroData = {
+      residencia: { residenciaId: 1 }, // Substituir com o ID da residência real
       nomeBem: nomeCarro,
       tipoVeiculo,
       kmMensal,
     };
+
+  
+
+
     try {
-      const response = await fetch("http://localhost:8080/bens/carro", {
+      const resposta = await fetch("http://localhost:8080/bens/carro", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(carroData),
       });
-      if (response.ok) {
-        alert("Carro adicionado com sucesso!");
+
+      if (resposta.ok) {
+        setMensagem("Carro adicionado com sucesso!");
+        setNomeCarro("");
+        setTipoVeiculo("");
+        setKmMensal(0);
       } else {
-        alert("Erro ao adicionar carro.");
+        setMensagem("Erro ao adicionar carro.");
       }
-    } catch (error) {
-      console.error("Erro ao adicionar carro:", error);
+    } catch {
+      setMensagem("Erro de conexão.");
     }
   };
 
-  const handleAdicionarGas = async () => {
-    if (!residenciaId) return alert("Adicione uma residência primeiro.");
-    const payload = {
-      residencia: { residenciaId },
-      nomeBem: tipoGas === "GLP" ? "Cilindro de Gás" : "Gás Encanado",
-      quantidadeMensal,
+
+  useEffect(() => {
+    const nome = localStorage.getItem("nomeUsuario");
+    const id = localStorage.getItem("idUsuario");
+
+    setNomeUsuario(nome);
+    setIdUsuario(id);
+  }, []);
+
+  const adicionarResidencia = async () => {
+    if (!idUsuario) {
+      setMensagem("Você precisa estar logado para adicionar uma residência.");
+      return;
+    }
+
+    const residenciaData = {
+      idUsuario: parseInt(idUsuario),
+      tipoResidencia,
+      endereco: {
+        cep,
+        logradouro,
+        cidade,
+        estado,
+      },
+      numMoradores,
+      numResidencia,
     };
+
     try {
-      const response = await fetch("http://localhost:8080/bens/gas", {
+      const resposta = await fetch("http://localhost:8080/residencias/adicionar", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(residenciaData),
       });
-      if (response.ok) {
-        alert("Gás adicionado com sucesso!");
+
+      if (resposta.ok) {
+        setMensagem("Residência adicionada com sucesso!");
+        // Resetando os campos após sucesso
+        setTipoResidencia("");
+        setCep("");
+        setLogradouro("");
+        setCidade("");
+        setEstado("");
+        setNumResidencia(0);
+        setNumMoradores(0);
       } else {
-        alert("Erro ao adicionar gás.");
+        setMensagem("Erro ao adicionar residência.");
       }
-    } catch (error) {
-      console.error("Erro ao adicionar gás:", error);
+    } catch {
+      setMensagem("Erro de conexão.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
-      <div className="bg-white shadow-md rounded-lg w-11/12 max-w-4xl p-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Bem-vindo, {userName || "Usuário"}!</h1>
-        <p className="text-gray-600 mb-6">Adicione informações sobre sua residência e bens para calcular o impacto.</p>
+    <div className="pagina-perfil flex flex-col items-center bg-gray-100 min-h-screen p-6">
+      <h1 className="text-4xl font-bold text-gray-800">
+        Bem-vindo, {nomeUsuario || "Usuário"}!
+      </h1>
 
-        {/* Formulário Residência */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Adicionar Residência</h2>
-          <div className="space-y-4">
-            <select
-              value={tipoResidencia}
-              onChange={(e) => setTipoResidencia(e.target.value)}
-              className="w-full p-3 border rounded-md"
-            >
-              <option value="">Selecione o tipo de residência</option>
-              <option value="Casa">Casa</option>
-              <option value="Apartamento">Apartamento</option>
-            </select>
-            <input
-              type="text"
-              placeholder="Endereço"
-              value={endereco}
-              onChange={(e) => setEndereco(e.target.value)}
-              className="w-full p-3 border rounded-md"
-            />
-            <input
-              type="number"
-              placeholder="Número"
-              value={numero || ""}
-              onChange={(e) => setNumero(Number(e.target.value))}
-              className="w-full p-3 border rounded-md"
-            />
-            <input
-              type="number"
-              placeholder="Moradores"
-              value={moradores || ""}
-              onChange={(e) => setMoradores(Number(e.target.value))}
-              className="w-full p-3 border rounded-md"
-            />
-            <button
-              onClick={handleAdicionarResidencia}
-              className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800"
-            >
-              Adicionar Residência
-            </button>
-          </div>
+      <div className="grid grid-cols-1 gap-4 mt-8">
+        <div className="p-4 bg-white shadow-md rounded-md">
+          <h2 className="text-xl font-bold mb-4">Adicionar Residência</h2>
+          {/* Inputs de residência */}
+          <select
+            value={tipoResidencia}
+            onChange={(e) => setTipoResidencia(e.target.value)}
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
+          >
+            <option value="" disabled>
+              Tipo de Residência
+            </option>
+            <option value="Casa">Casa</option>
+            <option value="Apartamento">Apartamento</option>
+          </select>
+
+          <input
+            type="text"
+            value={cep}
+            onChange={(e) => setCep(e.target.value)}
+            placeholder="CEP"
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 mt-2"
+          />
+
+          <input
+            type="text"
+            value={logradouro}
+            onChange={(e) => setLogradouro(e.target.value)}
+            placeholder="Logradouro"
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 mt-2"
+          />
+
+          <input
+            type="text"
+            value={cidade}
+            onChange={(e) => setCidade(e.target.value)}
+            placeholder="Cidade"
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 mt-2"
+          />
+
+          <input
+            type="text"
+            value={estado}
+            onChange={(e) => setEstado(e.target.value)}
+            placeholder="Estado"
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 mt-2"
+          />
+
+          <input
+            type="number"
+            value={numResidencia}
+            onChange={(e) => setNumResidencia(Number(e.target.value) || 0)}
+            placeholder="Número"
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 mt-2"
+          />
+
+          <input
+            type="number"
+            value={numMoradores}
+            onChange={(e) => setNumMoradores(Number(e.target.value) || 0)}
+            placeholder="Número de Moradores"
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 mt-2"
+          />
+
+          <button
+            onClick={adicionarResidencia}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
+          >
+            Adicionar
+          </button>
         </div>
 
-        {/* Outros Formulários */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Formulário Eletrodoméstico */}
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Adicionar Eletrodoméstico</h2>
-            <div className="space-y-4">
-              <select
-                value={eletrodomestico}
-                onChange={(e) => setEletrodomestico(e.target.value)}
-                className="w-full p-3 border rounded-md"
-              >
-                <option value="">Selecione o eletrodoméstico</option>
-                <option value="Geladeira">Geladeira</option>
-                <option value="Fogão">Fogão</option>
-              </select>
-              <input
-                type="number"
-                placeholder="Horas Diárias"
-                value={horasDiarias || ""}
-                onChange={(e) => setHorasDiarias(Number(e.target.value))}
-                className="w-full p-3 border rounded-md"
-              />
-              <button
-                onClick={handleAdicionarEletrodomestico}
-                className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800"
-              >
-                Adicionar Eletrodoméstico
-              </button>
-            </div>
-          </div>
+        {/* Adicionar Eletrodoméstico */}
+        {
+        <div className="p-4 bg-white shadow-md rounded-md">
+          <h2 className="text-xl font-bold mb-4">Adicionar Eletrodoméstico</h2>
+          <select
+            value={nomeBem}
+            onChange={(e) => setNomeBem(e.target.value)}
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
+          >
+            <option value="" disabled>Nome do Eletrodoméstico</option>
+            <option value="Geladeira">Geladeira</option>
+            <option value="Máquina de Lavar">Máquina de Lavar</option>
+            <option value="Microondas">Microondas</option>
+          </select>
+          <input
+            type="number"
+            value={horasDiarias}
+            onChange={(e) => setHorasDiarias(Number(e.target.value) || 0)}
+            placeholder="Horas Diárias"
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 mt-2 placeholder-gray-400"
+          />
 
-          {/* Formulário Carro */}
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Adicionar Carro</h2>
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Nome do Carro"
-                value={nomeCarro}
-                onChange={(e) => setNomeCarro(e.target.value)}
-                className="w-full p-3 border rounded-md"
-              />
-              <select
-                value={tipoVeiculo}
-                onChange={(e) => setTipoVeiculo(e.target.value)}
-                className="w-full p-3 border rounded-md"
-              >
-                <option value="">Selecione o tipo de veículo</option>
-                <option value="Gasolina">Gasolina</option>
-                <option value="Elétrico">Elétrico</option>
-              </select>
-              <input
-                type="number"
-                placeholder="Km Mensal"
-                value={kmMensal || ""}
-                onChange={(e) => setKmMensal(Number(e.target.value))}
-                className="w-full p-3 border rounded-md"
-              />
-              <button
-                onClick={handleAdicionarCarro}
-                className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800"
-              >
-                Adicionar Carro
-              </button>
-            </div>
-          </div>
-
-          {/* Formulário Gás */}
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Adicionar Gás</h2>
-            <div className="space-y-4">
-              <select
-                value={tipoGas}
-                onChange={(e) => setTipoGas(e.target.value)}
-                className="w-full p-3 border rounded-md"
-              >
-                <option value="">Selecione o tipo de gás</option>
-                <option value="GLP">GLP</option>
-                <option value="Natural">Natural</option>
-              </select>
-              <input
-                type="number"
-                placeholder="Quantidade Mensal"
-                value={quantidadeMensal || ""}
-                onChange={(e) => setQuantidadeMensal(Number(e.target.value))}
-                className="w-full p-3 border rounded-md"
-              />
-              <button
-                onClick={handleAdicionarGas}
-                className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800"
-              >
-                Adicionar Gás
-              </button>
-            </div>
-          </div>
+          <button
+            onClick={adicionarEletrodomestico}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
+          >
+            Adicionar
+          </button>
         </div>
+    }
+        
+
+        {/* Adicionar Carro */}
+        {
+        <div className="p-4 bg-white shadow-md rounded-md">
+          <h2 className="text-xl font-bold mb-4">Adicionar Carro</h2>
+          <input
+            type="text"
+            value={nomeCarro}
+            onChange={(e) => setNomeCarro(e.target.value)}
+            placeholder="Nome do Carro"
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
+          />
+          <select
+            value={tipoVeiculo}
+            onChange={(e) => setTipoVeiculo(e.target.value)}
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 mt-2"
+          >
+            <option value="" disabled>Tipo de Veículo</option>
+            <option value="Gasolina">Gasolina</option>
+            <option value="Diesel">Diesel</option>
+            <option value="Elétrico">Elétrico</option>
+          </select>
+          <input
+            type="number"
+            value={kmMensal}
+            onChange={(e) => setKmMensal(Number(e.target.value) || 0)}
+            placeholder="KM Mensal"
+            className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 mt-2"
+          />
+          <button
+            onClick={adicionarCarro}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
+          >
+            Adicionar
+          </button>
+        </div>
+    }
+
       </div>
+
+      {mensagem && (
+        <p
+          className={`mt-4 ${
+            mensagem.includes("sucesso") ? "text-green-500" : "text-red-500"
+          }`}
+        >
+          {mensagem}
+        </p>
+      )}
     </div>
   );
+  
 };
 
 export default PerfilPage;

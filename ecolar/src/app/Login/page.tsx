@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import '../globals.css';
+import Link from 'next/link';
 
 interface LoginFormData {
   firstName: string;
@@ -58,7 +59,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="flex overflow-hidden flex-col items-start font-medium bg-white">
-      <main className="flex flex-col mt-28 ml-36 max-w-full w-[626px] max-md:mt-10">
+      <main className="flex flex-col mt-10 ml-36 max-w-full w-[626px] max-md:mt-10">
         <h1 className="text-6xl font-bold tracking-tighter text-black whitespace-nowrap max-md:mr-0.5 max-md:max-w-full max-md:text-4xl">
           Login
         </h1>
@@ -98,6 +99,9 @@ const LoginPage: React.FC = () => {
               className="flex-1 shrink gap-2 px-4 py-2.5 mt-2 w-full text-xl bg-white rounded-lg border border-solid shadow-sm border-neutral-200 min-h-[49px] text-zinc-500 max-md:max-w-full"
               placeholder="••••••••"
             />
+          </div>
+          <div className="mt-5">
+            <Link href="/Cadastro">Não possui conta? Cadastre-se</Link>
           </div>
           <button
             type="submit"

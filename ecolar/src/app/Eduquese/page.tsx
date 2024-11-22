@@ -11,7 +11,10 @@ const EcoEducationPage: React.FC<EcoEducationPageProps> = () => {
         <div className="self-start text-6xl font-bold tracking-tighter text-black max-md:text-4xl">
           Eduque-se
         </div>
-        <div className="mt-52 max-md:mt-10 max-md:max-w-full">
+        <p className="mt-7 text-3xl text-black max-md:mt-10 max-md:max-w-full">
+        Aqui oferecemos informações essenciais sobre as emissões de monóxido de carbono (CO), um gás venenoso produzido pela queima incompleta de combustíveis. Através de dicas práticas e dados informativos, nossa missão é ajudar você a entender e reduzir os perigos do CO, promovendo um ambiente mais seguro e sustentável.
+          </p>
+        <div className="mt-16 max-md:mt-2 max-md:max-w-full">
           <div className="flex gap-5 max-md:flex-col">
             <div className="flex flex-col w-[33%] max-md:ml-0 max-md:w-full">
               <img
@@ -125,8 +128,8 @@ const EcoEducationPage: React.FC<EcoEducationPageProps> = () => {
             </div>
           </div>
         </div>
+        <div className="flex items-center justify-center mt-8 ml-3 max-w-full rounded-xl bg-neutral-200 bg-opacity-60 h-[66px] w-[110%]" />
       </div>
-      <div className="flex z-10 shrink-0 mt-0 ml-3 max-w-full rounded-xl bg-neutral-200 bg-opacity-60 h-[66px] w-[1429px]" />
     </div>
   );
 };

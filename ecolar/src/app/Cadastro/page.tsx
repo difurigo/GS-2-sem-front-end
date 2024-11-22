@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import '../globals.css';
 
-
 interface InputFieldProps {
   label: string;
   type: string;
@@ -37,7 +36,7 @@ const CadastroPage: React.FC = () => {
 
   return (
     <div className="flex overflow-hidden flex-col items-start font-medium bg-white">
-      <div className="flex flex-col mt-28 ml-36 max-w-full text-base w-[626px] max-md:mt-10">
+      <div className="flex flex-col mt-10 ml-36 max-w-full text-base w-[626px] max-md:mt-10">
         <h1 className="text-6xl font-bold tracking-tighter text-black whitespace-nowrap max-md:mr-0.5 max-md:max-w-full max-md:text-4xl">
           Cadastre-se
         </h1>

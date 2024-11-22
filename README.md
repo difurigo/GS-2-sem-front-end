@@ -21,3 +21,5 @@ Essas informações são usadas em Java para calcular a emissão de CO2, e como 
 Na pagina login o usuario pode se logar, ou se cadastrar clicando na opção de "ainda não sou cadastrado", logo após isso, na pagina de Perfil, o usuario podera adicionar a residencia e os bens.
 
 Na pagina "eduque-se" temos instruções sobre diminuição de emissão de CO2 e na pagina "integrantes" o RM, link para o linkedin e github
+
+Obrigado<3>

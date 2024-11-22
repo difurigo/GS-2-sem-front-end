@@ -6,7 +6,7 @@ interface CalculatorPageProps {
   userId?: string;
 }
 
-export default function CalculatorPage({ userId }: CalculatorPageProps) {
+export default function CalculatorPage({ }: CalculatorPageProps) {
   const [userName, setUserName] = useState<string>("");
 
   useEffect(() => {

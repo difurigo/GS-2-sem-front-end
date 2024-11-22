@@ -1,122 +1,165 @@
 "use client";
-import React, { useState } from 'react';
-import axios from 'axios';
-import '../globals.css';
+import React, { useState } from "react";
+import "../globals.css"; // Importação global de estilos
 
-interface InputFieldProps {
-  label: string;
-  type: string;
-  placeholder: string;
-  value: string;
-  onChange: (value: string) => void;
+// Componente para os campos de entrada do formulário
+interface CampoEntradaProps {
+  rotulo: string; // O texto exibido como rótulo acima do campo
+  tipo: string; // Tipo do campo (e.g., "text", "email", "password")
+  placeholder: string; // Texto de placeholder dentro do campo
+  valor: string; // Valor atual do campo
+  aoMudar: (valor: string) => void; // Função para lidar com alterações
 }
 
-const InputField: React.FC<InputFieldProps> = ({ label, type, placeholder, value, onChange }) => (
-  <div className="flex flex-col mt-2.5 w-full whitespace-nowrap min-h-[80px] max-md:max-w-full">
-    <label className="text-black max-md:max-w-full">{label}</label>
+// Componente reutilizável para criar campos de entrada
+const CampoEntrada: React.FC<CampoEntradaProps> = ({
+  rotulo,
+  tipo,
+  placeholder,
+  valor,
+  aoMudar,
+}) => (
+  <div className="campo-entrada-container flex flex-col mt-4 w-full">
+    <label className="rotulo text-black">{rotulo}</label>
     <input
-      type={type}
+      type={tipo}
       placeholder={placeholder}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="flex-1 shrink gap-2 px-4 py-3 mt-2 bg-white rounded-lg border border-solid shadow-sm border-neutral-200 size-full text-zinc-500 max-md:max-w-full"
+      value={valor}
+      onChange={(e) => aoMudar(e.target.value)}
+      className="campo-entrada px-4 py-2 mt-2 bg-white rounded-lg border border-solid shadow-sm border-neutral-200 text-zinc-500"
     />
   </div>
 );
 
-const CadastroPage: React.FC = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+const PaginaCadastro: React.FC = () => {
+  // Estados para armazenar valores de entrada do formulário
+  const [primeiroNome, setPrimeiroNome] = useState(""); // Armazena o primeiro nome do usuário
+  const [sobrenome, setSobrenome] = useState(""); // Armazena o sobrenome do usuário
+  const [email, setEmail] = useState(""); // Armazena o e-mail do usuário
+  const [senha, setSenha] = useState(""); // Armazena a senha do usuário
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrorMessage('');
-    setSuccessMessage('');
+  // Estados para controlar feedbacks e carregamento
+  const [estaEnviando, setEstaEnviando] = useState(false); // Indica se o formulário está sendo enviado
+  const [mensagemErro, setMensagemErro] = useState(""); // Armazena mensagens de erro
+  const [mensagemSucesso, setMensagemSucesso] = useState(""); // Armazena mensagens de sucesso
 
-    const usuario = {
-      nome: `${firstName} ${lastName}`,
+  // Função para lidar com o envio do formulário
+  const lidarComEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Previne o comportamento padrão de recarregar a página
+    setEstaEnviando(true); // Define o estado de carregamento
+    setMensagemErro(""); // Limpa mensagens de erro anteriores
+    setMensagemSucesso(""); // Limpa mensagens de sucesso anteriores
+
+    // Criação do objeto com os dados do usuário
+    const dadosUsuario = {
+      nome: `${primeiroNome} ${sobrenome}`, // Combina primeiro nome e sobrenome
       email: email,
-      senha: password,
+      senha: senha,
     };
 
     try {
-      const response = await axios.post('/usuario', usuario);
+      // Faz uma requisição para o servidor usando fetch
+      const resposta = await fetch("http://localhost:8080/usuario/cadastro", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Define o tipo de conteúdo
+        },
+        body: JSON.stringify(dadosUsuario), // Converte os dados do usuário para JSON
+      });
 
-      console.log('Usuário cadastrado com sucesso:', response.data);
-      setSuccessMessage('Cadastro realizado com sucesso!');
-      setFirstName('');
-      setLastName('');
-      setEmail('');
-      setPassword('');
-    } catch (error: any) {
-      console.error('Erro ao cadastrar usuário:', error);
-      setErrorMessage('Ocorreu um erro ao cadastrar o usuário. Tente novamente.');
+      if (resposta.ok) {
+        // Caso o cadastro seja bem-sucedido
+        const dados = await resposta.json();
+        console.log("Usuário cadastrado com sucesso:", dados);
+        setMensagemSucesso("Cadastro realizado com sucesso! Bem-vindo! 🎉");
+        // Limpa os campos do formulário
+        setPrimeiroNome("");
+        setSobrenome("");
+        setEmail("");
+        setSenha("");
+      } else {
+        // Caso a resposta não seja bem-sucedida, exibe mensagem de erro
+        const erroDados = await resposta.json();
+        console.error("Erro ao cadastrar usuário:", erroDados);
+        setMensagemErro("Ocorreu um erro ao cadastrar. Tente novamente.");
+      }
+    } catch (erro) {
+      // Lida com erros de conexão ou outros problemas
+      console.error("Erro de conexão:", erro);
+      setMensagemErro("Erro de conexão. Tente novamente mais tarde.");
     } finally {
-      setIsSubmitting(false);
+      setEstaEnviando(false); // Finaliza o estado de carregamento
     }
   };
 
   return (
-    <div className="flex overflow-hidden flex-col items-start font-medium bg-white">
-      <div className="flex flex-col mt-10 ml-36 max-w-full text-base w-[626px] max-md:mt-10">
-        <h1 className="text-6xl font-bold tracking-tighter text-black whitespace-nowrap max-md:mr-0.5 max-md:max-w-full max-md:text-4xl">
-          Cadastre-se
+    <div className="pagina-cadastro flex flex-col items-start bg-white">
+      <div className="conteudo-formulario flex flex-col mt-10 mx-auto max-w-xl w-full px-4">
+        <h1 className="titulo-pagina text-4xl font-bold text-black">
+          Crie sua Conta 🚀
         </h1>
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-wrap gap-9 mt-6">
-            <div className="flex flex-col flex-1 grow shrink-0 basis-0 min-h-[80px] w-fit">
-              <InputField
-                label="Primeiro nome"
-                type="text"
-                placeholder="Jane"
-                value={firstName}
-                onChange={setFirstName}
-              />
-            </div>
-            <div className="flex flex-col flex-1 grow shrink-0 basis-0 min-h-[80px] w-fit">
-              <InputField
-                label="Último nome"
-                type="text"
-                placeholder="Smitherton"
-                value={lastName}
-                onChange={setLastName}
-              />
-            </div>
-          </div>
-          <InputField
-            label="Email"
-            type="email"
-            placeholder="email@example.com"
-            value={email}
-            onChange={setEmail}
+        <p className="descricao-pagina text-lg text-gray-600 mt-2">
+          Preencha os campos abaixo para começar sua jornada conosco!
+        </p>
+
+        <form onSubmit={lidarComEnvio} className="formulario-cadastro mt-6">
+          {/* Campo para o primeiro nome */}
+          <CampoEntrada
+            rotulo="Primeiro Nome"
+            tipo="text"
+            placeholder="Digite seu primeiro nome"
+            valor={primeiroNome}
+            aoMudar={setPrimeiroNome}
           />
-          <InputField
-            label="Senha"
-            type="password"
-            placeholder="********"
-            value={password}
-            onChange={setPassword}
+
+          {/* Campo para o sobrenome */}
+          <CampoEntrada
+            rotulo="Sobrenome"
+            tipo="text"
+            placeholder="Digite seu sobrenome"
+            valor={sobrenome}
+            aoMudar={setSobrenome}
           />
+
+          {/* Campo para o e-mail */}
+          <CampoEntrada
+            rotulo="E-mail"
+            tipo="email"
+            placeholder="seuemail@exemplo.com"
+            valor={email}
+            aoMudar={setEmail}
+          />
+
+          {/* Campo para a senha */}
+          <CampoEntrada
+            rotulo="Senha"
+            tipo="password"
+            placeholder="Crie uma senha segura"
+            valor={senha}
+            aoMudar={setSenha}
+          />
+
+          {/* Botão de envio */}
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="gap-2 self-stretch px-8 py-4 mt-10 text-xl text-white whitespace-nowrap bg-black rounded-lg shadow-sm max-md:px-5"
+            disabled={estaEnviando}
+            className="botao-cadastro w-full px-6 py-3 mt-6 text-white bg-black hover:bg-gray-700 rounded-lg text-lg font-medium"
           >
-            {isSubmitting ? 'Cadastrando...' : 'Cadastre'}
+            {estaEnviando ? "Cadastrando..." : "Cadastrar"}
           </button>
+
         </form>
 
-        {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
-        {successMessage && <p className="text-green-500 mt-4">{successMessage}</p>}
+        {/* Exibição de mensagens de erro ou sucesso */}
+        {mensagemErro && (
+          <p className="mensagem-erro text-red-500 mt-4">{mensagemErro}</p>
+        )}
+        {mensagemSucesso && (
+          <p className="mensagem-sucesso text-green-500 mt-4">{mensagemSucesso}</p>
+        )}
       </div>
     </div>
   );
 };
 
-export default CadastroPage;
+export default PaginaCadastro;

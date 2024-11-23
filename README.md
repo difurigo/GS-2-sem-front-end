@@ -6,6 +6,9 @@ Luis Henrique RM:558935
 Diego Furigo: RM558755
 Melissa Pereira da Costa RM555656
 
+## Link do video no youtube
+https://youtube.com/watch?v=BuY0IVRn6WI&si=OIbxSCRz3EawKKrS
+
 ## Link do repositorio DE FRONT-END
 https://github.com/difurigo/GS-2-sem-front-end/blob/main/README.md
 
